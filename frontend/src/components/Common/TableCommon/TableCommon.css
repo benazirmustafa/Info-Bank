@@ -1,0 +1,19 @@
+/* .ant-table-thead tr > th {
+  background-color: #f6c68f !important;
+} */
+@media only screen and (max-width: 600px) {
+  .ant-table-content table {
+    font-size: 12px;
+  }
+  .ant-table-cell-fix-right-first {
+    width: 1% !important;
+    text-align: center;
+  }
+  #fixed_action button {
+    font-size: 12px;
+    padding: 0 3px;
+  }
+}
+/* .ant-table-column-sorter {
+  color: black !important;
+} */

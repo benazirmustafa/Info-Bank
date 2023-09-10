@@ -1,0 +1,15 @@
+*.py[cod]
+__pycache__/
+desktop.ini
+db.sqlite3
+media/
+Include/
+Lib/
+Scripts/
+tcl/
+LICENSE.txt
+package-lock.json
+node_modules
+/static/
+.venv/
+venv/

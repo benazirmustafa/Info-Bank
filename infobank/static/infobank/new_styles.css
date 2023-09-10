@@ -1,0 +1,262 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: "Poppins", sans-serif;
+  color: #555;
+}
+
+.navbar-brand h1 {
+  font-weight: 700;
+  color: #000;
+}
+.navbar-brand span {
+  color: #d24826;
+}
+.navbar-toggler {
+  outline: none !important;
+  border: none;
+}
+.navbar-toggler i {
+  color: #555 !important;
+  font-size: 30px !important;
+}
+.navbar-nav li {
+  padding: 0 10px;
+}
+.nav-link {
+  color: #555 !important;
+  text-align: right;
+}
+.home-page-white-color {
+  color: #fff;
+}
+
+/* NAVBAR DROPDOWN */
+.dropdown-item {
+  color: #555;
+}
+.dropdown-item .fa {
+  margin-right: 10px;
+}
+
+/* Home Page */
+/* Header & Banner */
+.header {
+  background: radial-gradient(#d24826, #d24826e3);
+}
+.banner {
+  text-align: center;
+  padding: 40px 0;
+}
+.banner h3 {
+  font-size: 30px;
+  color: #fff;
+  font-weight: 600;
+}
+.banner-title {
+  font-size: 50px;
+  margin-bottom: 25px;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Home - CATEGORIES */
+.section-title {
+  text-align: center;
+  margin: 30px 0;
+  position: relative;
+  line-height: 60px;
+  color: #555;
+  font-weight: 600;
+}
+.section-title::after {
+  background: #ff523b;
+  width: 80px;
+  height: 5px;
+  border-radius: 5px;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.categories {
+  margin-bottom: 30px;
+}
+
+.category-card {
+  padding: 40px 20px;
+  box-shadow: 0 0 20px 0px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  margin: 30px 30px;
+  transition: transform 0.5s;
+  cursor: pointer;
+}
+.category-card:hover {
+  transform: translateY(-10px);
+}
+.category-card img {
+  padding: 15px 0;
+}
+.card-link {
+  text-decoration: none;
+  color: #555;
+  font-size: 20px;
+  font-weight: 600;
+}
+.card-link:hover {
+  color: #555;
+}
+/* Home Footer */
+.footer {
+  background: #000;
+  color: #8a8a8a;
+  font-size: 14px;
+  padding: 60px 0 20px;
+  position: relative;
+}
+.u-color {
+  color: #d24826;
+}
+
+/* Section */
+.section {
+  margin: 20px 10px;
+}
+
+/* Breadcumb */
+.breadcumb {
+  font-size: 20px;
+  /* font-weight: 500; */
+}
+.breadcumb a {
+  text-decoration: none;
+  color: #555;
+}
+.breadcumb .fa {
+  margin: 0 5px;
+  color: #555;
+}
+
+/* Table */
+.table {
+  color: #555;
+  margin: 20px auto;
+}
+.table tr {
+  border-bottom: 1px solid #555;
+}
+.folder-table tbody td {
+  /* max-width: 0; */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 10px 5px;
+}
+.folder-table td .fa {
+  margin-right: 10px;
+  margin-left: 10px;
+}
+.folder-table td img {
+  margin-right: 10px;
+  margin-left: 10px;
+  width: 20px;
+}
+.folder-table tbody td:first-child a {
+  text-align: right;
+  display: flex;
+  align-items: center;
+  color: #555;
+  text-decoration: none;
+  cursor: pointer;
+}
+.folder-table td .btn {
+  padding: 0;
+  outline: none;
+}
+
+.folder-table td .btn:focus {
+  outline: none;
+}
+
+.badge {
+  padding: 5px 10px;
+}
+
+/* Form */
+.eroor-message {
+  display: none;
+  text-align: center;
+  background: #d24826;
+  color: #fff;
+}
+
+/* FOLDERS */
+.admin-btn-section .btn {
+  margin: 0px 10px;
+}
+
+.no-data-icon-container {
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  background: #ff523b;
+  padding: 20px 0px;
+  margin: 10px 0;
+}
+.no-data-icon {
+  font-size: 50px;
+  color: #fff;
+}
+.no-data-text {
+  margin: 10px 0;
+}
+/* Button */
+.ui-btn {
+  background: #d24826;
+  color: #fff;
+}
+.ui-btn-close {
+  border: 1px solid #d24826;
+  color: #d24826;
+}
+.ui-btn-close-primary {
+  border: 1px solid #007bff;
+  color: #007bff;
+}
+.ui-btn a {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Login Modal */
+.login-modal-header {
+  background: radial-gradient(#d24826, #d24826e3);
+  color: #fff;
+}
+
+/* Modals */
+.modal-header .close {
+  color: #fff;
+}
+#progress {
+  border-radius: 5px;
+  overflow: hidden;
+  background: #e9ecef;
+  display: none;
+}
+
+#progress .bar {
+  height: 18px;
+  background-color: #d24826;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+}
+.progress .progress-bar {
+  -webkit-transition: none;
+  -o-transition: none;
+  transition: none;
+}

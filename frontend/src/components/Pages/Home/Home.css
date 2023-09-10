@@ -1,0 +1,13 @@
+.section-title {
+  text-align: center;
+  font-size: 33px;
+  color: #555;
+  font-weight: 600;
+}
+/* @media only screen and (max-width: 576px) {...}  */
+@media only screen and (min-width: 992px) {
+  .site-layout-background{
+    margin: 0px 112px;
+  }
+}
+

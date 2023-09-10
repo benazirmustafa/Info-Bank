@@ -1,0 +1,761 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ulkasemi Info Bank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Ecommerce Website Created for Learning" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- Bootstrap -->
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+  <!-- jQuery and JS bundle w/ Popper.js -->
+  <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <link rel="stylesheet" href="{% static " infobank/new_styles.css" %}" />
+
+  <script src="{% static 'infobank/js/jquery.ui.widget.js' %}"></script>
+  <script src="{% static 'infobank/js/jquery.iframe-transport.js' %}"></script>
+  <script src="{% static 'infobank/js/jquery.fileupload.js' %}"></script>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <!-- NAVBAR & BANNER-->
+  <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <a class="navbar-brand" href="{% url 'infobank:home' %}">
+        <h1><span>U</span>LKASEMI</h1>
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fa fa-bars"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'infobank:home' %}">Home</a>
+          </li>
+
+          <li>
+            {% if user.is_authenticated %}
+            <div class="dropdown">
+              <a class="nav-link" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">{{user.get_full_name}} <i class="fa fa-angle-down"></i></a>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <a class="dropdown-item" href="#"><i class="fa fa-cloud-upload"></i>Manage Files</a>
+                {% if user.is_superuser %}
+                <a class="dropdown-item" href="{% url 'infobank:manage_users' %}"><i class="fa fa-users"></i>Manage
+                  Users</a>
+                {% endif %}
+              </div>
+            </div>
+            {% else %}
+            <a id="myBtn" class="nav-link" data-toggle="modal" data-target="#loginModal">Login</a>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+  <!-- BREDCUMB -->
+  <section id="breadcum" class="section">
+    <div class="container breadcumb">
+      <div class="row align-items-center">
+        <a href="{% url 'infobank:home' %}">Home</a>
+        <i class="fa fa-angle-right" aria-hidden="true"></i>
+        <a href="{% url 'infobank:category_details' category.slug %}">{{category.name}}</a>
+        {% for each_item in breadcumbs %}
+        <i class="fa fa-angle-right" aria-hidden="true"></i>
+        <a href="{% url 'infobank:folder_details' each_item.id %}">{{each_item.name}}</a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section id="admin-buttions" class="section">
+    <div class="container">
+      <div class="row admin-btn-section justify-content-end">
+        {% if can_add_folder %}
+        <button class="btn btn-warning" data-toggle="modal" data-target="#newFolderModal">
+          <i class="fa fa-plus"></i> New Folder
+        </button>
+        {% endif %}
+        <!-- USER -->
+        {% if can_upload %}
+        <button class="btn btn-info" data-toggle="modal" data-target="#fileUploadModal">
+          <i class="fa fa-upload"></i> Upload File
+        </button>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section id="file-section" class="section">
+    {% if folders or files %}
+    <div class="container">
+      <div class="row">
+        <div class="table-responsive">
+          <table class="table table-borderless folder-table">
+            <thead>
+              <tr>
+                <th style="width: 30%">Name</th>
+                <th style="width: 60%">Description</th>
+                <th style="width: 10%"></th>
+                <!-- <th>Subtotal</th> -->
+              </tr>
+            </thead>
+            <tbody>
+              {% for folder in folders %}
+              <tr>
+                <td>
+                  <a href="{% url 'infobank:folder_details' folder.id %}">
+                    <i class="fa fa-folder"></i>
+                    {{folder.name}}
+                  </a>
+                </td>
+                <td class="folder-desc">{{folder.description}}</td>
+                <td>
+                  <!-- <button class="btn" id="details-btn">
+                      <i class="fa fa-info-circle"></i>
+                    </button> -->
+                  {% if can_add_folder %}
+                  <button class="btn" id="details-btn"
+                    onclick="showUpdateFolderModal('{{folder.id}}', '{{folder.name}}', '{{folder.description}}')">
+                    <i class="fa fa-pencil"></i></button><button class="btn" id="details-btn"
+                    onclick="showDeleteFolderModal('{{folder.id}}', '{{folder.name}}')">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+              <!-- File Section -->
+              {% for file in files %}
+              <tr>
+                <td>
+                  <a href="{{file.file.url}}" target="_blank">
+                    {% if file.extension == ".pptx" %}
+                    <img src="{% static 'infobank/icons/powerpoint.png' %}" alt="" />
+                    {% elif file.extension == ".docx" %}
+                    <img src="{% static 'infobank/icons/word.png' %}" alt="" />
+                    {% elif file.extension == ".pdf" %}
+                    <img src="{% static 'infobank/icons/pdf.png' %}" alt="" />
+                    {% else %}
+                    <img src="{% static 'infobank/icons/file.png' %}" alt="" />
+                    {% endif %} {{file.name}}
+                  </a>
+                </td>
+                <td class="folder-desc">{{file.description}}</td>
+                <td>
+                  {% if can_upload %}
+                  <button class="btn" id="details-btn"
+                    onclick="showUpdateFileModal('{{file.id}}', '{{file.name}}', '{{file.description}}')">
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                  <button class="btn" id="details-btn" onclick="showDeleteFileModal('{{file.id}}', '{{file.name}}')">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    {% else %}
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="d-flex flex-column align-items-center">
+          <div class="d-flex justify-content-center align-items-center no-data-icon-container">
+            <i class="fa fa-cloud no-data-icon"></i>
+          </div>
+          <h4 class="no-data-text">No Data Found on This Folder</h4>
+          <button class="btn ui-btn">
+            <a href="{% url 'infobank:home' %}">Go Back to Home</a>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {% endif %}
+  </section>
+
+  <script>
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          // Does this cookie string begin with the name we want?
+          if (cookie.substring(0, name.length + 1) === name + "=") {
+            cookieValue = decodeURIComponent(
+              cookie.substring(name.length + 1)
+            );
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+  </script>
+
+  {% if not user.is_authenticated %}
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal fade" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <!-- Modal content -->
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header login-modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Login</h5>
+        </div>
+        <div class="modal-body">
+          <form action="{% url 'infobank:login' %}" method="POST" id="login-form">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="email">Email:</label><br />
+              <input type="email" id="email" name="email" required="true" placeholder="Enter Your Email"
+                class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="password">Password:</label><br />
+              <input type="password" id="password" name="password" required="true" placeholder="Enter Your Password"
+                class="form-control" />
+            </div>
+          </form>
+          <p class="eroor-message">Invalid Email or Password.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn ui-btn-close" data-dismiss="modal">
+            Close
+          </button>
+          <button type="submit" form="login-form" id="submit-btn" class="btn ui-btn">
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    $("#login-form").on("submit", function (e) {
+      e.preventDefault();
+      $(".eroor-message").css("display", "none");
+      var data = $("form").serialize();
+      $.ajax({
+        type: "POST",
+        url: "{% url 'infobank:login' %}",
+        data: data,
+        success: function (data) {
+          if (data.status == "ok") {
+            $(".eroor-message").css("display", "none");
+            location.reload();
+          } else if (data.status == "failed") {
+            $(".eroor-message").css("display", "block");
+          }
+        },
+        error: function (data) {
+          console.log("Error", data);
+        },
+      });
+    });
+  </script>
+  {% endif %}
+
+  <!-- New Folder Modal -->
+  {% if can_add_folder %}
+  <div id="newFolderModal" class="modal fade" tabindex="-1" aria-labelledby="newFolderModalLabel" aria-hidden="true">
+    <!-- Modal content -->
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header login-modal-header">
+          <h5 class="modal-title" id="newFolderModalLabel">
+            Create New Folder
+          </h5>
+        </div>
+        <div class="modal-body">
+          <form method="POST" id="newFolderForm">
+            {% csrf_token %}
+            <input type="hidden" name="parent_directory" value="{% if folder %}{{folder.id}}{% endif %}" />
+            <input type="hidden" name="category" value="{{category.id}}" />
+
+            <div class="form-group">
+              <label for="name">Name:</label><br />
+              <input type="text" id="name" name="name" required="true" placeholder="Enter Folder Name"
+                class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="description">Description:</label><br />
+              <textarea class="form-control" id="description" name="description"
+                placeholder="Write Some Description Here" rows="3"></textarea>
+            </div>
+          </form>
+          <p class="eroor-message"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn ui-btn-close" data-dismiss="modal">
+            Close
+          </button>
+          <button type="submit" form="newFolderForm" id="submit-btn" class="btn ui-btn">
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $("#newFolderForm").on("submit", function (e) {
+      e.preventDefault();
+      $(".eroor-message").css("display", "none");
+      var data = $("#newFolderForm").serialize();
+      $.ajax({
+        type: "POST",
+        url: "{% url 'infobank:manage_folder' %}",
+        data: data,
+        success: function (data) {
+          if (data.status == "ok") {
+            console.log("HERE");
+            $(".eroor-message").css("display", "none");
+            location.reload();
+          } else if (data.status == "failed") {
+            $(".eroor-message").text(data.message);
+            $(".eroor-message").css("display", "block");
+          }
+        },
+        error: function (data) {
+          console.log("Error", data);
+        },
+      });
+    });
+  </script>
+
+  <!-- Update Folder Modal -->
+  <div id="updateFolderModal" class="modal fade" tabindex="-1" aria-labelledby="updateFolderModalLabel"
+    aria-hidden="true">
+    <!-- Modal content -->
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header login-modal-header">
+          <h5 class="modal-title" id="updateFolderModalLabel">
+            Update Folder Info
+          </h5>
+        </div>
+        <div class="modal-body">
+          <form method="PUT" id="updateFolderForm">
+            <!-- {% csrf_token %} -->
+            <input type="hidden" id="updateFolderId" name="folder_id" required />
+            <div class="form-group">
+              <label for="name">Name:</label><br />
+              <input type="text" id="updateFolderName" name="name" required="true" placeholder="Enter Folder Name"
+                class="form-control" value="" />
+            </div>
+            <div class="form-group">
+              <label for="description">Description:</label><br />
+              <textarea class="form-control" id="updateFolderDescription" name="description"
+                placeholder="Write Some Description Here" rows="3"></textarea>
+            </div>
+          </form>
+          <p class="eroor-message"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn ui-btn-close" data-dismiss="modal">
+            Close
+          </button>
+          <button type="submit" form="updateFolderForm" id="submit-btn" class="btn ui-btn">
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Folder Script -->
+  <script>
+    function showUpdateFolderModal(id, name, description) {
+      $("#updateFolderId").val(id);
+      $("#updateFolderName").val(name);
+      $("#updateFolderDescription").val(description);
+      $("#updateFolderModal").modal("show");
+    }
+    $("#updateFolderModal").on("hidden.bs.modal", function (e) {
+      $("#updateFolderForm").trigger("reset");
+    });
+
+    $("#updateFolderForm").on("submit", function (e) {
+      e.preventDefault();
+      $(".eroor-message").css("display", "none");
+      var data = $("#updateFolderForm").serialize();
+      $.ajax({
+        type: "PUT",
+        url: "{% url 'infobank:manage_folder' %}",
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+        },
+        data: data,
+        success: function (data) {
+          if (data.status == "ok") {
+            $(".eroor-message").css("display", "none");
+            location.reload();
+          } else if (data.status == "failed") {
+            $(".eroor-message").text(data.message);
+            $(".eroor-message").css("display", "block");
+          }
+        },
+        error: function (data) {
+          console.log("Error", data);
+        },
+      });
+    });
+  </script>
+
+  <!-- DELETE FOLDER MODAL -->
+  <div id="deleteFolderModal" class="modal fade" tabindex="-1" aria-labelledby="deleteFolderModalLabel"
+    aria-hidden="true">
+    <!-- Modal content -->
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header login-modal-header">
+          <h5 class="modal-title" id="deleteFolderModalLabel">
+            Delete Folder
+          </h5>
+        </div>
+        <div class="modal-body">
+          <form method="PUT" id="deleteFolderForm">
+            <input type="hidden" id="deleteFolderId" name="folder_id" required />
+          </form>
+          <p>
+            Do you Really Want to Delete the Folder
+            <b id="deleteFolderName"></b> and all it's Contents?
+          </p>
+          <p class="eroor-message"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn ui-btn-close" data-dismiss="modal">
+            Cancel
+          </button>
+          <button type="submit" form="deleteFolderForm" id="submit-btn" class="btn btn-danger">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Folder Script -->
+  <script>
+    function showDeleteFolderModal(id, name) {
+      $("#deleteFolderId").val(id);
+      $("#deleteFolderName").text(name);
+      $("#deleteFolderModal").modal("show");
+    }
+    $("#deleteFolderModal").on("hidden.bs.modal", function (e) {
+      $("#deleteFolderName").text("");
+      $("#deleteFolderForm").trigger("reset");
+    });
+
+    $("#deleteFolderForm").on("submit", function (e) {
+      e.preventDefault();
+      $(".eroor-message").css("display", "none");
+      var data = $("#deleteFolderForm").serialize();
+      $.ajax({
+        type: "DELETE",
+        url: "{% url 'infobank:manage_folder' %}",
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+        },
+        data: data,
+        success: function (data) {
+          if (data.status == "ok") {
+            $(".eroor-message").css("display", "none");
+            location.reload();
+          } else if (data.status == "failed") {
+            $(".eroor-message").text(data.message);
+            $(".eroor-message").css("display", "block");
+          }
+        },
+        error: function (data) {
+          console.log("Error", data);
+        },
+      });
+    });
+  </script>
+  {% endif %}
+
+  <!-- FILE MANAGE SECTION -->
+  {% if can_upload %}
+  <!-- File Upload Modal -->
+  <div id="fileUploadModal" class="modal fade" data-backdrop="static" data-keyboard="false" tabindex="-1"
+    aria-labelledby="fileUploadModalLabel" aria-hidden="true">
+    <!-- Modal content -->
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header login-modal-header">
+          <h5 class="modal-title" id="fileUploadModalLabel">
+            Upload New File
+          </h5>
+        </div>
+        <div class="modal-body">
+          <form method="POST" id="fileUploadForm" action="{% url 'infobank:manage_file' %}"
+            enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="folder" value="{% if folder %}{{folder.id}}{% endif %}" />
+            <input type="hidden" name="category" value="{{category.id}}" />
+
+            <div class="form-group">
+              <label for="name">Name:</label><br />
+              <input type="text" id="name" name="name" placeholder="Enter File Name" maxlength="100"
+                class="form-control" required="true" />
+            </div>
+            <div class="form-group">
+              <label for="description">Description:</label><br />
+              <textarea class="form-control" id="description" name="description"
+                placeholder="Write Some Description Here (max: 250 Char)" rows="3" maxlength="250"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="description">File:</label><br />
+              <input type="file" id="file" name="file" required="true" accept=".pdf, .docx, .pptx" />
+            </div>
+          </form>
+          <p class="eroor-message"></p>
+          <div id="progress">
+            <div class="bar" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="fileUploadModalBtn" class="btn ui-btn-close" data-dismiss="modal">
+            Close
+          </button>
+          <button id="fileUploadModalBtn" form="fileUploadForm" type="submit" id="uploadFileSubmitBtn"
+            class="btn ui-btn">
+            Upload
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $("#fileUploadForm").submit(function (e) {
+      console.log("here", this);
+      e.preventDefault();
+      var formData = new FormData(this);
+      console.log(formData);
+      $.ajax({
+        type: "POST",
+        url: "{% url 'infobank:manage_file' %}",
+        data: formData,
+        processData: false,
+        contentType: false,
+        xhr: function () {
+          var xhr = new window.XMLHttpRequest();
+          //Upload progress
+          xhr.upload.addEventListener(
+            "progress",
+            function (evt) {
+              if (evt.lengthComputable) {
+                var progress = parseInt((evt.loaded / evt.total) * 100, 10);
+                $("#progress .bar")
+                  .css("width", progress + "%")
+                  .text(progress + "%");
+              }
+            },
+            false
+          );
+          // //Download progress
+          // xhr.addEventListener(
+          //   "progress",
+          //   function (evt) {
+          //     if (evt.lengthComputable) {
+          //       var progress = parseInt((evt.loaded / evt.total) * 100, 10);
+
+          //     }
+          //   },
+          //   false
+          // );
+          return xhr;
+        },
+        beforeSend: function () {
+          $("#progress").css("display", "block");
+          $("#fileUploadModalBtn").prop("disabled", true);
+        },
+        success: function (data) {
+          if (data.status == "ok") {
+            $(".eroor-message").css("display", "none");
+            location.reload();
+          } else if (data.status == "failed") {
+            $(".eroor-message").text(data.message);
+            $(".eroor-message").css("display", "block");
+          }
+        },
+        error: function (data) {
+          $("#progress").css("display", "block");
+          $("#fileUploadModalBtn").prop("disabled", false);
+        },
+      });
+    });
+  </script>
+
+  <!-- UPDATE FILE MODAL -->
+  <div id="updateFileModal" class="modal fade" tabindex="-1" aria-labelledby="updateFileModalLabel" aria-hidden="true">
+    <!-- Modal content -->
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header login-modal-header">
+          <h5 class="modal-title" id="updateFileModalLabel">
+            Update File Info
+          </h5>
+        </div>
+        <div class="modal-body">
+          <form method="PUT" id="updateFileForm">
+            <!-- {% csrf_token %} -->
+            <input type="hidden" id="updateFileId" name="file_id" required />
+            <div class="form-group">
+              <label for="name">Name:</label><br />
+              <input type="text" id="updateFileName" name="name" required="true" placeholder="Enter File Name"
+                class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="description">Description:</label><br />
+              <textarea class="form-control" id="updateFileDescription" name="description"
+                placeholder="Write Some Description Here" rows="3"></textarea>
+            </div>
+          </form>
+          <p class="eroor-message"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn ui-btn-close" data-dismiss="modal">
+            Close
+          </button>
+          <button type="submit" form="updateFileForm" id="submit-btn" class="btn ui-btn">
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update File Script -->
+  <script>
+    function showUpdateFileModal(id, name, description) {
+      $("#updateFileId").val(id);
+      $("#updateFileName").val(name);
+      $("#updateFileDescription").val(description);
+      $("#updateFileModal").modal("show");
+    }
+    $("#updateFileModal").on("hidden.bs.modal", function (e) {
+      $("#updateFileForm").trigger("reset");
+    });
+
+    $("#updateFileForm").on("submit", function (e) {
+      e.preventDefault();
+      $(".eroor-message").css("display", "none");
+      var data = $("#updateFileForm").serialize();
+      $.ajax({
+        type: "PUT",
+        url: "{% url 'infobank:manage_file' %}",
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+        },
+        data: data,
+        success: function (data) {
+          if (data.status == "ok") {
+            $(".eroor-message").css("display", "none");
+            location.reload();
+          } else if (data.status == "failed") {
+            $(".eroor-message").text(data.message);
+            $(".eroor-message").css("display", "block");
+          }
+        },
+        error: function (data) {
+          console.log("Error", data);
+        },
+      });
+    });
+  </script>
+
+  <!-- DELETE FILE MODAL -->
+  <div id="deleteFileModal" class="modal fade" tabindex="-1" aria-labelledby="deleteFileModalLabel" aria-hidden="true">
+    <!-- Modal content -->
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header login-modal-header">
+          <h5 class="modal-title" id="deleteFileModalLabel">Delete File</h5>
+        </div>
+        <div class="modal-body">
+          <form method="DELETE" id="deleteFileForm">
+            <input type="hidden" id="deleteFileId" name="file_id" required />
+          </form>
+          <p>
+            Do you Really Want to delete this file:
+            <b id="deleteFileName"></b>?
+          </p>
+          <p class="eroor-message"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn ui-btn-close" data-dismiss="modal">
+            Cancel
+          </button>
+          <button type="submit" form="deleteFileForm" id="submit-btn" class="btn btn-danger">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete FILE Script -->
+  <script>
+    function showDeleteFileModal(id, name) {
+      $("#deleteFileId").val(id);
+      $("#deleteFileName").text(name);
+      $("#deleteFileModal").modal("show");
+    }
+    $("#deleteFileModal").on("hidden.bs.modal", function (e) {
+      $("#deleteFileName").text("");
+      $("#deleteFileForm").trigger("reset");
+    });
+
+    $("#deleteFileForm").on("submit", function (e) {
+      e.preventDefault();
+      $(".eroor-message").css("display", "none");
+      var data = $("#deleteFileForm").serialize();
+      $.ajax({
+        type: "DELETE",
+        url: "{% url 'infobank:manage_file' %}",
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+        },
+        data: data,
+        success: function (data) {
+          if (data.status == "ok") {
+            $(".eroor-message").css("display", "none");
+            location.reload();
+          } else if (data.status == "failed") {
+            $(".eroor-message").text(data.message);
+            $(".eroor-message").css("display", "block");
+          }
+        },
+        error: function (data) {
+          console.log("Error", data);
+        },
+      });
+    });
+  </script>
+  {% endif %}
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+.sidepannel {
+  border-right: 0;
+  background-color:white;
+  border: 1px solid #d5d5d5;
+}
+#sidepanel_label{
+  font-style: "italic";
+   font-weight: 600;
+   margin-bottom: 2px 
+}

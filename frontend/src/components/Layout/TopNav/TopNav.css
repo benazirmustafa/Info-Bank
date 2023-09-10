@@ -1,0 +1,66 @@
+.header {
+  background: radial-gradient(#d24826, #d24826e3);
+  padding: 0px 5%  !important;
+}
+.header1 {
+  background: white;
+  padding: 0px 5%  !important;
+}
+.logoTxt1{
+   font-weight: 700;
+  color: black;
+  display: inline;
+  font-size: 32px;
+}
+.logoTxt {
+  font-weight: 700;
+  color: white;
+  display: inline;
+  font-size: 32px;
+}
+.TopMenu {
+  display: inline-block;
+  float: right;
+}
+.banner {
+  text-align: center;
+  padding: 40px 0;
+  line-height: 0.7;
+}
+.TitileSection {
+  background: radial-gradient(#d24826, #d24826e3);
+  color: white;
+}
+.banner-title {
+  font-size: 50px;
+  margin-bottom: 25px;
+  color: #fff;
+  font-weight: 700;
+}
+.banner h3 {
+  font-size: 30px;
+  color: #fff;
+  font-weight: 600;
+}
+
+@media only screen and (max-width: 500px) {
+ .banner-title {
+    font-size: 25px;
+    margin-bottom: 25px;
+    color: #fff;
+    font-weight: 700;
+}
+  .logoTxt1 {
+    font-size: 24px;
+  }
+  .logoTxt {
+    font-size: 24px;
+  }
+}
+@media only screen and (max-width:380px) {
+  
+   #user-name{
+     display: none;
+   }
+ }
+

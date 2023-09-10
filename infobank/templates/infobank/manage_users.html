@@ -1,0 +1,353 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ulkasemi Info Bank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Ecommerce Website Created for Learning" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- Bootstrap -->
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+  <!-- jQuery and JS bundle w/ Popper.js -->
+  <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <link rel="stylesheet" href="{% static " infobank/new_styles.css" %}" />
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <!-- NAVBAR & BANNER-->
+  <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <a class="navbar-brand" href="{% url 'infobank:home' %}">
+        <h1><span>U</span>LKASEMI</h1>
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fa fa-bars"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'infobank:home' %}">Home</a>
+          </li>
+
+          <li>
+            {% if user.is_authenticated %}
+            <div class="dropdown">
+              <a class="nav-link" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">{{user.get_full_name}} <i class="fa fa-angle-down"></i></a>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <a class="dropdown-item" href="#"><i class="fa fa-cloud-upload"></i>Manage Files</a>
+                {% if user.is_superuser %}
+                <a class="dropdown-item" href="{% url 'infobank:manage_users' %}"><i class="fa fa-users"></i>Manage
+                  Users</a>
+                {% endif %}
+
+              </div>
+            </div>
+            {% else %}
+            <a id="myBtn">Login</a>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+  <!-- USER LIST -->
+  <section id="page-title" class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <h5 class="float-left">All Users</h5>
+        </div>
+        <div class="col">
+          <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#signUpModal">
+            <i class="fa fa-plus"></i> Add New User
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="user-list" class="section">
+    <div class="container">
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th scope="col">Employee</th>
+              <th scope="col">Email</th>
+              <th scope="col">Permissions</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for each_user in users %}
+            <tr>
+              <td class="align-middle">{{each_user.get_full_name}}</td>
+              <td class="align-middle">{{each_user.email}}</td>
+              <td class="align-middle">
+                {% if each_user.is_superuser %}
+                <h2 class="badge badge-primary">Admin</h2>
+                {% elif each_user.has_permissions %}
+                <!-- Normal User -->
+                {% if each_user.category_set.all.count > 0 %}
+                <!-- If User Is Owner of Category -->
+                {% for category in each_user.category_set.all %}
+                <a href="{% url 'infobank:category_details' category.slug %}">{{category}}</a><br />
+                {%endfor %}
+                <!-- End of For Loop -->
+                {% endif %}
+                <!-- Folder Permissions -->
+                {% if each_user.folder_set.all.count > 0 %}
+                <!-- If User Is Owner of Category -->
+                {% for folder in each_user.folder_set.all %}
+                <a href="{% url 'infobank:folder_details' folder.id %}">{{folder}}</a><br />
+                {% endfor %}
+                <!-- End of For Loop -->
+                {% endif %}
+                <!-- For No Permissions -->
+                {% else %}
+                <p class="badge badge-danger">No Permissions</p>
+                {% endif %}
+              </td>
+              <td class="align-middle">
+                {% if each_user == user or not each_user.is_superuser %}
+                <button class="btn btn-primary" disabled>
+                  <i class="fa fa-pencil" aria-hidden="true"></i>
+                </button>
+                {% endif %} {% if not each_user.is_superuser %}
+                <button class="btn btn-danger" onclick="showDeleteModal('{{each_user.id}}', '{{each_user.email}}')">
+                  <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal -->
+  <div class="modal fade" id="signUpModal" data-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Create New User</h5>
+        </div>
+        <div class="modal-body">
+          <form method="POST" id="signUpForm">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="email">Email address</label>
+              <input type="email" class="form-control" name="email" id="email" placeholder="name@ulkasemi.com"
+                required="true" />
+            </div>
+            <div class="form-group">
+              <label for="exampleFormControlInput1">Employee Name</label>
+              <div class="row">
+                <div class="col">
+                  <input type="text" class="form-control" id="first_name" name="first_name" placeholder="First name"
+                    required="true" />
+                </div>
+                <div class="col">
+                  <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Last name"
+                    required="true" />
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="exampleFormControlInput1">Employee ID</label>
+              <input type="text" class="form-control" id="employee_id" name="employee_id"
+                placeholder="Employee Office ID" required="true" />
+            </div>
+            <div class="form-group">
+              <label for="exampleFormControlSelect2">Choose Permission Type</label>
+              <select class="form-control" name="perm_type" id="perm_type" required="true">
+                <option value="" disabled selected>
+                  Select Permission Type
+                </option>
+                <option value="category">Category Owner</option>
+                <option value="folder">Folder Owner</option>
+              </select>
+            </div>
+            <div class="form-group" style="display: none" id="category-perm-container">
+              <label for="exampleFormControlSelect2">Choose Categories</label>
+              <select multiple class="form-control" name="category_set" id="category_set">
+                {% for category in categories %}
+                <option value="{{category.id}}">{{category}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group" style="display: none" id="folder-perm-container">
+              <label for="exampleFormControlSelect2">Choose Folders</label>
+              <select multiple class="form-control" name="folder_set" id="folder_set">
+                <!-- Loop through categories -->
+                {% for category in categories %}
+                <!-- if has folders -->
+                {% if category.folder_set.all.count > 0 %}
+                <option disabled>{{category}}</option>
+                {% for folder in category.folder_set.all %}
+                <option value="{{folder.id}}">{{folder}}</option>
+                {% endfor %} {% endif %} {% endfor %}
+              </select>
+            </div>
+            <!-- <div class="form-group">
+                <label for="exampleFormControlTextarea1"
+                  >Example textarea</label
+                >
+                <textarea
+                  class="form-control"
+                  id="exampleFormControlTextarea1"
+                  rows="3"
+                ></textarea>
+              </div> -->
+          </form>
+          <p class="eroor-message">Invalid Email or Password.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="reset" form="signUpForm" class="btn ui-btn-close-primary" data-dismiss="modal">
+            Close
+          </button>
+          <button type="submit" form="signUpForm" class="btn btn-primary">
+            Create User
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Delete User?</h5>
+        </div>
+        <div class="modal-body">
+          <p>
+            Do you really want to delete this user:
+            <span id="del-user-email"></span>?
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn ui-btn-close" data-dismiss="modal">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-danger" onclick="deleteUser()">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    var del_user_id;
+
+    function showDeleteModal(id, email) {
+      del_user_id = id;
+      $("#del-user-email").text(email);
+      $("#deleteUserModal").modal("show");
+    }
+    $("#deleteUserModal").on("hidden.bs.modal", function (e) {
+      del_user_id = null;
+    });
+
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          // Does this cookie string begin with the name we want?
+          if (cookie.substring(0, name.length + 1) === name + "=") {
+            cookieValue = decodeURIComponent(
+              cookie.substring(name.length + 1)
+            );
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    function deleteUser() {
+      $.ajax({
+        type: "DELETE",
+        url: "/user/" + del_user_id,
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+        },
+        success: function (data) {
+          if (data.status == "ok") {
+            location.reload();
+          }
+        },
+        error: function (data) {
+          console.log("Error", data);
+        },
+      });
+    }
+  </script>
+
+  <!-- Submit Form -->
+  <script>
+    $("#perm_type").change(function () {
+      if (this.value == "category") {
+        $("#folder_set").prop("required", false);
+        $("#folder_set").prop("selectedIndex", -1);
+        $("#folder-perm-container").css("display", "none");
+        $("#category_set").prop("required", true);
+        $("#category-perm-container").css("display", "block");
+      } else if (this.value == "folder") {
+        $("#folder_set").prop("required", true);
+        $("#folder-perm-container").css("display", "block");
+        $("#category_set").prop("required", false);
+        $("#category_set").prop("selectedIndex", -1);
+        $("#category-perm-container").css("display", "none");
+      }
+    });
+
+    // RESET Form on Modal Close
+    $("#signUpModal").on("hidden.bs.modal", function (e) {
+      $("#signUpForm")[0].reset();
+    });
+  </script>
+  <script>
+    $("#signUpForm").on("submit", function (e) {
+      e.preventDefault();
+      $(".eroor-message").css("display", "none");
+      var data = $("#signUpForm").serialize();
+      $.ajax({
+        type: "POST",
+        url: "{% url 'infobank:manage_users' %}",
+        data: data,
+        success: function (data) {
+          if (data.status == "ok") {
+            $(".eroor-message").css("display", "none");
+            location.reload();
+          } else if (data.status == "failed") {
+            $(".eroor-message").css("display", "block");
+            $(".eroor-message").text(data.message);
+          }
+        },
+        error: function (data) {
+          console.log("Error", data);
+        },
+      });
+    });
+  </script>
+</body>
+
+</html>
